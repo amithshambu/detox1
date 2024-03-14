@@ -1,42 +1,47 @@
-// screens/ClockScreen.js
+// ClockScreen.js
 
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, StatusBar } from 'react-native';
-import AppList from './AppList';
-
-// Function to fetch current time
-const getCurrentTime = () => {
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
-  return `${hours}:${minutes}:${seconds}`;
-};
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import AppMenu from './AppMenu';
+import AppSelectionModal from './AppSelectionModal';
 
 const ClockScreen = () => {
-  const [currentTime, setCurrentTime] = useState(getCurrentTime());
+  const [selectedApps, setSelectedApps] = useState(new Array(5).fill(null));
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState(null);
 
-  useEffect(() => {
-    // Update time every second
-    const interval = setInterval(() => {
-      setCurrentTime(getCurrentTime());
-    }, 1000);
+  const handleAppSelection = (index) => {
+    setSelectedButtonIndex(index);
+    setModalVisible(true);
+  };
 
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
-  const handleAppSelect = (appName) => {
-    // Handle app selection here
-    console.log('Selected app:', appName);
+  const handleAppSelect = (selectedApp) => {
+    const updatedApps = [...selectedApps];
+    updatedApps[selectedButtonIndex] = selectedApp.appName;
+    setSelectedApps(updatedApps);
   };
 
   return (
     <View style={styles.container}>
-      <StatusBar hidden />
-      <AppList onSelectApp={handleAppSelect} />
-      <Text style={styles.clock}>{currentTime}</Text>
+      <View style={styles.clockContainer}>
+        <Text style={styles.clockText}>Clock Display</Text>
+      </View>
+      <View style={styles.appsContainer}>
+        {selectedApps.map((app, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.appButton}
+            onPress={() => handleAppSelection(index)}
+          >
+            <Text style={styles.appButtonText}>{app ? app : 'Select App'}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <AppSelectionModal
+        visible={modalVisible}
+        onSelect={handleAppSelect}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -48,9 +53,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  clock: {
+  clockContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  clockText: {
     color: 'white',
-    fontSize: 48,
+    fontSize: 24,
+  },
+  appsContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  appButton: {
+    backgroundColor: 'gray',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  appButtonText: {
+    color: 'white',
+    fontSize: 16,
   },
 });
 
