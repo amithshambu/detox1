@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, StatusBar } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
+import AppList from './AppList';
 
 // Function to fetch current time
 const getCurrentTime = () => {
@@ -27,9 +27,15 @@ const ClockScreen = () => {
     };
   }, []);
 
+  const handleAppSelect = (appName) => {
+    // Handle app selection here
+    console.log('Selected app:', appName);
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
+      <AppList onSelectApp={handleAppSelect} />
       <Text style={styles.clock}>{currentTime}</Text>
     </View>
   );
